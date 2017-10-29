@@ -15,6 +15,61 @@ describe Period do
     end
   end
 
+  context '.add' do
+    subject { Period.new() }
+
+    context 'positive cases' do
+
+      it 'can add an interval' do
+        subject.add(1,3)
+        subject.intervals.map(&:values).must_equal [[1,3]]
+      end
+
+      it 'can add two intervals' do
+        subject.add(1,3)
+        subject.add(4,6)
+        subject.intervals.map(&:values).must_equal [[1,6]]
+      end
+
+      it 'can merge intervals' do
+        subject.add(1,2)
+        subject.add(3,4)
+        subject.add(7,8)
+        # subject.add(2,7) # TODO: it should work
+        # subject.intervals.map(&:values).must_equal [[1,8]]
+        subject.intervals.map(&:values).must_equal [[1,4], [7,8]]
+      end
+    end
+
+    context 'negative cases' do
+      it 'does not accept boundary intervals' do
+        subject.add(1,3)
+        Proc.new do
+          subject.add(3,6)
+        end.must_raise Exceptions::CrossedIntervals
+      end
+
+      it 'does not accept crossed intervals' do
+        subject.add(1,6)
+        Proc.new do
+          subject.add(2,3)
+        end.must_raise Exceptions::CrossedIntervals
+      end
+
+      it 'does not accept interval with start after the end' do
+        Proc.new do
+          subject.add(3,1)
+        end.must_raise Exceptions::IntervalStartAfterEnd
+      end
+
+      it 'does not accept interval with start equal to end' do
+        Proc.new do
+          subject.add(3,3)
+        end.must_raise Exceptions::IntervalStartEqualToEnd
+      end
+    end
+  end
+
   context 'positive cases' do
     it 'creates empty period by default' do
       Period.new.intervals.must_be_empty
@@ -63,7 +118,7 @@ describe Period do
       end.must_raise Exceptions::IntervalStartEqualToEnd
     end
 
-    it 'accept interval only as Array' do
+    it 'accepts interval only as Array' do
       wrong_formats = {
         integer: [1, [2,3]],
         string: [[2,3], '1'],
@@ -98,7 +153,7 @@ describe Period do
       end.must_raise Exceptions::WrongIntervalFormat
     end
 
-    it 'accept interval with two points only' do
+    it 'accepts interval with two points only' do
       Proc.new do
         Period.new([[1,2,3]])
       end.must_raise Exceptions::WrongIntervalFormat
