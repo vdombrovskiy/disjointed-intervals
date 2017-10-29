@@ -18,8 +18,13 @@ class Period
   def init_intervals
     self.intervals = []
 
-    @raw_intervals.each do |i|
-      self.intervals << Interval.new(*i)
+    @raw_intervals.each do |points|
+      raise Exceptions::WrongIntervalFormat if !points.is_a?(Array) || points.size != 2
+
+      pretendent = Interval.new(*points)
+      raise Exceptions::CrossedIntervals if self.intervals.any?{ |i| i.overlaps?(pretendent) }
+
+      self.intervals << pretendent
     end
   end
 end

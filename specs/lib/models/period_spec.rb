@@ -17,18 +17,19 @@ describe Period do
 
   context 'positive cases' do
     it 'creates empty period by default' do
-      period = Period.new
-      period.intervals.must_be_empty
+      Period.new.intervals.must_be_empty
     end
 
     it 'fills intervals if passed' do
-      period = Period.new([[1,3], [4,6]])
-      period.intervals.size.must_equal 2
+      Period.new([[1,3], [4,6]]).intervals.size.must_equal 2
     end
 
-    it 'correctly fills divided intervals ' do
-      period = Period.new([[1,3], [5,10]])
-      period.intervals.size.must_equal 2
+    it 'correctly fills divided intervals' do
+      Period.new([[1,3], [5,10]]).intervals.size.must_equal 2
+    end
+
+    it 'correctly fills non integer values' do
+      Period.new([['1',3], [5.3,10]]).intervals.size.must_equal 2
     end
   end
 
@@ -77,6 +78,12 @@ describe Period do
     it 'does not accept interval with more then two points' do
       Proc.new do
         Period.new([[1,2,3]])
+      end.must_raise Exceptions::WrongIntervalFormat
+    end
+
+    it 'does not accept interval with points non castable to integer' do
+      Proc.new do
+        Period.new([[1,{}]])
       end.must_raise Exceptions::WrongIntervalFormat
     end
 
