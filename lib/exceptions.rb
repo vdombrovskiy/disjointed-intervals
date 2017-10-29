@@ -25,4 +25,10 @@ module Exceptions
       'Wrong interval format. Should be array with 2 integers. Example: [1,2]'
     end
   end
+
+  class WrongPointFormat < Base
+    def message
+      'Wrong point format. Should be an positive integer'
+    end
+  end
 end

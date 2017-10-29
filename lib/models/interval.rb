@@ -12,4 +12,12 @@ class Interval
   def overlaps?(other)
     (self.start_point..self.end_point).overlaps?(other.start_point..other.end_point)
   end
+
+  def points
+    (self.start_point..self.end_point).to_a.map{ |p| Point.new(p) }
+  end
+
+  def values
+    [self.start_point, self.end_point]
+  end
 end

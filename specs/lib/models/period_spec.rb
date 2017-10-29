@@ -20,8 +20,13 @@ describe Period do
       Period.new.intervals.must_be_empty
     end
 
+    it 'fills points if passed' do
+      Period.new([[1,3], [4,6]]).points.size.must_equal 6
+    end
+
     it 'fills intervals if passed' do
-      Period.new([[1,3], [4,6]]).intervals.size.must_equal 2
+      Period.new([[1,3], [4,6]]).intervals.size.must_equal 1
+      Period.new([[1,3], [4,6]]).intervals.map(&:values).must_equal [[1,6]]
     end
 
     it 'correctly fills divided intervals' do
