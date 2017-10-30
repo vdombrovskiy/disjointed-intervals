@@ -26,34 +26,28 @@ describe Period do
 
       it 'can add two intervals' do
         subject.add(1,3)
-        subject.add(4,6).must_equal [[1,6]]
+        subject.add(4,6).must_equal [[1,3], [4,6]]
       end
 
       it 'can merge intervals' do
-        subject.add(1,2)
-        subject.add(3,4)
-        subject.add(7,8)
-        # subject.add(2,7) # TODO: it should work
-        # subject.intervals.map(&:values).must_equal [[1,8]]
-        subject.add(2,7).must_equal [[1,4], [7,8]]
+        subject.add(1, 5)
+        subject.intervals.map(&:values).must_equal [[1, 5]]
+
+        subject.remove(2, 3)
+        subject.intervals.map(&:values).must_equal [[1, 2], [3, 5]]
+
+        subject.add(6, 8)
+        subject.intervals.map(&:values).must_equal [[1, 2], [3, 5], [6, 8]]
+
+        subject.remove(4, 7)
+        subject.intervals.map(&:values).must_equal [[1, 2], [3, 4], [7, 8]]
+
+        subject.add(2, 7)
+        subject.intervals.map(&:values).must_equal [[1, 8]]
       end
     end
 
     context 'negative cases' do
-      it 'does not accept boundary intervals' do
-        subject.add(1,3)
-        Proc.new do
-          subject.add(3,6)
-        end.must_raise Exceptions::CrossedIntervals
-      end
-
-      it 'does not accept crossed intervals' do
-        subject.add(1,6)
-        Proc.new do
-          subject.add(2,3)
-        end.must_raise Exceptions::CrossedIntervals
-      end
-
       it 'does not accept interval with start after the end' do
         Proc.new do
           subject.add(3,1)
@@ -102,12 +96,12 @@ describe Period do
     end
 
     it 'fills points if passed' do
-      Period.new([[1,3], [4,6]]).points.size.must_equal 6
+      Period.new([[1,3], [4,6]]).points.size.must_equal 4
     end
 
     it 'fills intervals if passed' do
-      Period.new([[1,3], [4,6]]).intervals.size.must_equal 1
-      Period.new([[1,3], [4,6]]).intervals.map(&:values).must_equal [[1,6]]
+      Period.new([[1,3], [4,6]]).intervals.size.must_equal 2
+      Period.new([[1,3], [4,6]]).intervals.map(&:values).must_equal [[1,3], [4,6]]
     end
 
     it 'correctly fills divided intervals' do
@@ -120,18 +114,6 @@ describe Period do
   end
 
   context 'negative cases' do
-    it 'does not accept crossed intervals' do
-      Proc.new do
-        Period.new([[1,3], [2,4]])
-      end.must_raise Exceptions::CrossedIntervals
-    end
-
-    it 'does not accept boundary intervals' do
-      Proc.new do
-        Period.new([[1,3], [3,6]])
-      end.must_raise Exceptions::CrossedIntervals
-    end
-
     it 'does not accept interval with start after the end' do
       Proc.new do
         Period.new([[3,1]])

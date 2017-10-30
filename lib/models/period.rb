@@ -4,34 +4,34 @@ class Period
     init_intervals
   end
 
-  attr_accessor :intervals
   attr_accessor :points
 
   def add(start_point, end_point)
     build_interval([start_point, end_point])
-    intervals.map(&:values)
+    self.intervals.map(&:values)
   end
 
   def remove(start_point, end_point)
-    remove_interval([start_point, end_point])
-    raise NotImplementedError
+    interval = Interval.new(start_point, end_point)
+
+    self.points.reject!{ |pt| pt.start_point.in?(interval.range) && pt.end_point.in?(interval.range) }
+    self.intervals.map(&:values)
   end
 
   def intervals
     result = []
     s = nil
 
-    values = self.points.map(&:value)
-    values.each.with_index do |val, idx|
-      s ||= val
-      e = val
+    self.points.each.with_index do |pt, idx|
+      s ||= pt.start_point
+      e = pt.end_point
 
-      if values[idx + 1] != val.next
+      if self.points[idx + 1].try(:start_point) != e
         result << Interval.new(s, e)
-        s = values[idx + 1]
+        s = self.points[idx + 1].try(:start_point)
       end
 
-      break if s.nil?
+      break unless self.points[idx + 1]
     end
 
     result
@@ -39,7 +39,6 @@ class Period
 
   private
   def init_intervals
-    self.intervals = []
     self.points = []
 
     @raw_intervals.each do |i|
@@ -51,15 +50,13 @@ class Period
     raise Exceptions::WrongIntervalFormat if !raw_interval.is_a?(Array) || raw_interval.size != 2
 
     interval = Interval.new(*raw_interval)
-    raise Exceptions::CrossedIntervals if self.intervals.any?{ |i| i.overlaps?(interval) }
 
-    self.points |= interval.points
-    self.points.sort_by!(&:value)
+    Range.new(*interval.values).each_cons(2).each do |pair|
+      self.points << Point.new(*pair)
+    end
+
+    self.points.sort_by!(&:start_point).uniq!{ |pt| [pt.start_point, pt.end_point] }
 
     interval
-  end
-
-  def remove_interval(raw_interval)
-    
   end
 end

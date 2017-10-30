@@ -20,4 +20,8 @@ class Interval
   def values
     [self.start_point, self.end_point]
   end
+
+  def range
+    self.start_point..self.end_point
+  end
 end
