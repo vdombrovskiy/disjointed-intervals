@@ -14,7 +14,7 @@ print '>>> '
 
 begin
   period = Period.new
-  while(input = gets.chomp)
+  while (input = gets.chomp)
     args = input.split(/\(|\)|,/)
     period.public_send(*args)
 
