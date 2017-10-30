@@ -30,20 +30,11 @@ describe Period do
       end
 
       it 'can merge intervals' do
-        subject.add(1, 5)
-        subject.intervals.map(&:values).must_equal [[1, 5]]
-
-        subject.remove(2, 3)
-        subject.intervals.map(&:values).must_equal [[1, 2], [3, 5]]
-
-        subject.add(6, 8)
-        subject.intervals.map(&:values).must_equal [[1, 2], [3, 5], [6, 8]]
-
-        subject.remove(4, 7)
-        subject.intervals.map(&:values).must_equal [[1, 2], [3, 4], [7, 8]]
-
-        subject.add(2, 7)
-        subject.intervals.map(&:values).must_equal [[1, 8]]
+        subject.add(1, 5).must_equal [[1, 5]]
+        subject.remove(2, 3).must_equal [[1, 2], [3, 5]]
+        subject.add(6, 8).must_equal [[1, 2], [3, 5], [6, 8]]
+        subject.remove(4, 7).must_equal [[1, 2], [3, 4], [7, 8]]
+        subject.add(2, 7).must_equal [[1, 8]]
       end
     end
 

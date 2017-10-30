@@ -1,21 +1,19 @@
 require './environment'
 
-period = Period.new
-
-period.add(1, 5)
-period.remove(2, 3)
-period.add(6, 8)
-period.remove(4, 7)
-period.add(2, 7)
-
-p period.intervals.map(&:values)
+puts 'Examples of usage: add(1, 5) or remove(2, 3)'
 
 period = Period.new
 
-puts 'Please use either :add or :remove'
+p "Call: add(1, 5) => #{period.add(1, 5)}"
+p "Call: remove(2, 3) => #{period.remove(2, 3)}"
+p "Call: add(6, 8) => #{period.add(6, 8)}"
+p "Call: remove(4, 7) => #{period.remove(4, 7)}"
+p "Call: add(2, 7) => #{period.add(2, 7)}"
+
 print '>>> '
 
 begin
+  period = Period.new
   while(input = gets.chomp)
     args = input.split(/\(|\)|,/)
     period.public_send(*args)

@@ -23,12 +23,13 @@ class Period
     s = nil
 
     self.points.each.with_index do |pt, idx|
+      next_start_point = self.points[idx + 1].try(:start_point)
       s ||= pt.start_point
       e = pt.end_point
 
-      if self.points[idx + 1].try(:start_point) != e
+      if next_start_point != e
         result << Interval.new(s, e)
-        s = self.points[idx + 1].try(:start_point)
+        s = next_start_point
       end
 
       break unless self.points[idx + 1]
