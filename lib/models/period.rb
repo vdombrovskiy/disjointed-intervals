@@ -14,22 +14,22 @@ class Period
   def remove(start_point, end_point)
     interval = Interval.new(start_point, end_point)
 
-    self.points.reject! { |pt| pt.start_point.in?(interval.range) && pt.end_point.in?(interval.range) }
+    self.points.reject! { |point| point.start_point.in?(interval.range) && point.end_point.in?(interval.range) }
     self.intervals.map(&:values)
   end
 
   def intervals
     result = []
-    s = nil
+    start_point = nil
 
-    self.points.each.with_index do |pt, idx|
+    self.points.each.with_index do |point, idx|
       next_start_point = self.points[idx + 1].try(:start_point)
-      s ||= pt.start_point
-      e = pt.end_point
+      start_point ||= point.start_point
+      end_point = point.end_point
 
-      if next_start_point != e
-        result << Interval.new(s, e)
-        s = next_start_point
+      if next_start_point != end_point
+        result << Interval.new(start_point, end_point)
+        start_point = next_start_point
       end
 
       break unless self.points[idx + 1]
@@ -57,7 +57,7 @@ class Period
       self.points << Point.new(*pair)
     end
 
-    self.points.sort_by!(&:start_point).uniq! { |pt| [pt.start_point, pt.end_point] }
+    self.points.sort_by!(&:start_point).uniq! { |point| [point.start_point, point.end_point] }
 
     interval
   end
