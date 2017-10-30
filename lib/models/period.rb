@@ -9,9 +9,11 @@ class Period
 
   def add(start_point, end_point)
     build_interval([start_point, end_point])
+    intervals.map(&:values)
   end
 
   def remove(start_point, end_point)
+    remove_interval([start_point, end_point])
     raise NotImplementedError
   end
 
@@ -55,5 +57,9 @@ class Period
     self.points.sort_by!(&:value)
 
     interval
+  end
+
+  def remove_interval(raw_interval)
+    
   end
 end

@@ -21,14 +21,12 @@ describe Period do
     context 'positive cases' do
 
       it 'can add an interval' do
-        subject.add(1,3)
-        subject.intervals.map(&:values).must_equal [[1,3]]
+        subject.add(1,3).must_equal [[1,3]]
       end
 
       it 'can add two intervals' do
         subject.add(1,3)
-        subject.add(4,6)
-        subject.intervals.map(&:values).must_equal [[1,6]]
+        subject.add(4,6).must_equal [[1,6]]
       end
 
       it 'can merge intervals' do
@@ -37,7 +35,7 @@ describe Period do
         subject.add(7,8)
         # subject.add(2,7) # TODO: it should work
         # subject.intervals.map(&:values).must_equal [[1,8]]
-        subject.intervals.map(&:values).must_equal [[1,4], [7,8]]
+        subject.add(2,7).must_equal [[1,4], [7,8]]
       end
     end
 
@@ -65,6 +63,34 @@ describe Period do
       it 'does not accept interval with start equal to end' do
         Proc.new do
           subject.add(3,3)
+        end.must_raise Exceptions::IntervalStartEqualToEnd
+      end
+    end
+  end
+
+  context '.remove' do
+    subject { Period.new() }
+
+    before :each do
+      subject.add(1,5)
+    end
+
+    context 'positive cases' do
+      it 'removes interval correctly' do
+        subject.remove(2,3).must_equal [[1, 2], [3, 5]]
+      end
+    end
+
+    context 'negative cases' do
+      it 'does not accept interval with start after the end' do
+        Proc.new do
+          subject.remove(3,1)
+        end.must_raise Exceptions::IntervalStartAfterEnd
+      end
+
+      it 'does not accept interval with start equal to end' do
+        Proc.new do
+          subject.remove(3,3)
         end.must_raise Exceptions::IntervalStartEqualToEnd
       end
     end
