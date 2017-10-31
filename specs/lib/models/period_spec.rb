@@ -6,10 +6,6 @@ describe Period do
       subject.must_respond_to :intervals
     end
 
-    it 'has points' do
-      subject.must_respond_to :points
-    end
-
     it 'can add an interval' do
       subject.must_respond_to :add
     end

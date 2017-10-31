@@ -5,7 +5,7 @@ class Period
     init_intervals
   end
 
-  attr_accessor :points, :intervals
+  attr_accessor :intervals
 
   def add(start_point, end_point)
     build_interval([start_point, end_point])
