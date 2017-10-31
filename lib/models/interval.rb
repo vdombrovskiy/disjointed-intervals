@@ -14,6 +14,6 @@ class Interval
   end
 
   def range
-    self.start_point..self.end_point
+    self.start_point...self.end_point + 1
   end
 end

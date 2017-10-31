@@ -1,3 +1,4 @@
+require 'interval_tree'
 system 'rm Gemfile' if File.exist?('Gemfile')
 
 File.write('Gemfile', <<-GEMFILE)

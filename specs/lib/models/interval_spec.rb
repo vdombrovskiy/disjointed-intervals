@@ -8,7 +8,7 @@ describe Interval do
 
   context '.range' do
     it 'returns range with start/end boundaries' do
-      Interval.new(2,3).range.must_equal (2..3)
+      Interval.new(2,3).range.must_equal (2...4)
     end
   end
 

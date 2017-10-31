@@ -131,22 +131,18 @@ describe Period do
       Period.new.intervals.must_be_empty
     end
 
-    it 'fills points if passed' do
-      Period.new([[1, 3], [4, 6]]).points.size.must_equal 4
-    end
-
-    it 'fills boundary intervals' do
-      intervals = Period.new([[1, 3], [4, 6]]).intervals
+    it 'fills edge intervals' do
+      intervals = Period.new([[1, 3], [4, 6]]).interval_edges
       intervals.size.must_equal 2
-      intervals.map(&:values).must_equal [[1, 3], [4, 6]]
+      intervals.must_equal [[1, 3], [4, 6]]
     end
 
     it 'correctly fills divided intervals' do
-      Period.new([[1, 3], [5, 10]]).intervals.size.must_equal 2
+      Period.new([[1, 3], [5, 10]]).interval_edges.size.must_equal 2
     end
 
     it 'correctly fills non integer values' do
-      Period.new([['1', 3], [5.3, 10]]).intervals.size.must_equal 2
+      Period.new([['1', 3], [5.3, 10]]).interval_edges.size.must_equal 2
     end
   end
 

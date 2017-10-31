@@ -4,44 +4,37 @@ class Period
     init_intervals
   end
 
-  attr_accessor :points
+  attr_accessor :points, :intervals
 
   def add(start_point, end_point)
     build_interval([start_point, end_point])
-    self.intervals.map(&:values)
+    self.interval_edges
   end
 
   def remove(start_point, end_point)
     interval = Interval.new(start_point, end_point)
+    interval_tree = IntervalTree::Tree.new(self.intervals)
+    intersections = interval_tree.search(interval.range).to_a
 
-    self.points.reject! { |point| point.start_point.in?(interval.range) && point.end_point.in?(interval.range) }
-    self.intervals.map(&:values)
+    if intersections.any?
+      self.intervals -= intersections
+      self.intervals.concat(split_intervals(intersections, interval.range))
+    end
+    #self.intervals.sort_by!(&:min)
+
+    self.interval_edges
   end
 
-  def intervals
-    result = []
-    start_point = nil
-
-    self.points.each.with_index do |point, idx|
-      next_start_point = self.points[idx + 1].try(:start_point)
-      start_point ||= point.start_point
-      end_point = point.end_point
-
-      if next_start_point != end_point
-        result << Interval.new(start_point, end_point)
-        start_point = next_start_point
-      end
-
-      break unless self.points[idx + 1]
-    end
-
-    result
+  def interval_edges
+    self.intervals.uniq.
+      map { |interval| [interval.try(:min), interval.try(:max)] }.
+      reject { |interval| interval.compact.empty? }
   end
 
   private
 
   def init_intervals
-    self.points = []
+    self.intervals = []
 
     @raw_intervals.each do |i|
       build_interval(i)
@@ -52,13 +45,32 @@ class Period
     raise Exceptions::WrongIntervalFormat if !raw_interval.is_a?(Array) || raw_interval.size != 2
 
     interval = Interval.new(*raw_interval)
+    interval_tree = IntervalTree::Tree.new(self.intervals)
+    intersections = interval_tree.search(interval.range).to_a
 
-    Range.new(*interval.values).each_cons(2).each do |pair|
-      self.points << Point.new(*pair)
+    if intersections.any?
+      self.intervals -= intersections
+      self.intervals << merge_intervals(intersections.push(interval.range))
+    else
+      self.intervals << interval.range
     end
 
-    self.points.sort_by!(&:start_point).uniq! { |point| [point.start_point, point.end_point] }
+    self.intervals.sort_by!(&:min)
+  end
 
-    interval
+  def merge_intervals(intervals)
+    intervals.map(&:min).min...intervals.map(&:max).max + 1
+  end
+
+  def split_intervals(intervals, gap)
+    interval_min = intervals.map(&:min).min
+    interval_max = intervals.map(&:max).max
+    if gap.min > interval_min && gap.max < interval_max
+      [interval_min...gap.min + 1, gap.max...interval_max + 1]
+    elsif gap.min > interval_min && gap.max > interval_max
+      [interval_min...gap.min + 1]
+    else
+      []
+    end
   end
 end
