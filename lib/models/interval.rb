@@ -14,6 +14,8 @@ class Interval
   end
 
   def range
+    #(start...end + 1) needed for correct search of interval intersections
+    #https://github.com/misshie/interval-tree
     self.start_point...self.end_point + 1
   end
 end

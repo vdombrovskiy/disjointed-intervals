@@ -51,12 +51,16 @@ class Period
   end
 
   def merge_intervals(intervals)
+    #(start...end + 1) needed for correct search of interval intersections
+    #https://github.com/misshie/interval-tree
     intervals.map(&:min).min...intervals.map(&:max).max + 1
   end
 
   def split_intervals(intervals, gap)
     interval_min = intervals.map(&:min).min
     interval_max = intervals.map(&:max).max
+    #(start...end + 1) needed for correct search of interval intersections
+    #https://github.com/misshie/interval-tree
     if gap.min > interval_min && gap.max < interval_max
       [interval_min...gap.min + 1, gap.max...interval_max + 1]
     elsif gap.min > interval_min && gap.max > interval_max
