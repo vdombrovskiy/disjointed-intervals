@@ -19,7 +19,7 @@ begin
     args = input.split(/\(|\)|,/)
     period.public_send(*args)
 
-    p period.intervals.map(&:values)
+    p period.interval_edges
     print '>>> '
   end
 rescue Exception => e

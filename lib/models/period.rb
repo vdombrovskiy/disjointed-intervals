@@ -1,3 +1,4 @@
+
 class Period
   def initialize(raw_intervals = [])
     @raw_intervals = raw_intervals
@@ -13,14 +14,9 @@ class Period
 
   def remove(start_point, end_point)
     interval = Interval.new(start_point, end_point)
-    interval_tree = IntervalTree::Tree.new(self.intervals)
-    intersections = interval_tree.search(interval.range).to_a
-
-    if intersections.any?
-      self.intervals -= intersections
+    intersections = find_intersections(interval) do |intersections|
       self.intervals.concat(split_intervals(intersections, interval.range))
     end
-    #self.intervals.sort_by!(&:min)
 
     self.interval_edges
   end
@@ -28,7 +24,7 @@ class Period
   def interval_edges
     self.intervals.uniq.
       map { |interval| [interval.try(:min), interval.try(:max)] }.
-      reject { |interval| interval.compact.empty? }
+      reject { |interval| interval.compact.empty? }.sort_by(&:min)
   end
 
   private
@@ -45,16 +41,12 @@ class Period
     raise Exceptions::WrongIntervalFormat if !raw_interval.is_a?(Array) || raw_interval.size != 2
 
     interval = Interval.new(*raw_interval)
-    interval_tree = IntervalTree::Tree.new(self.intervals)
-    intersections = interval_tree.search(interval.range).to_a
 
-    if intersections.any?
-      self.intervals -= intersections
+    intersections = find_intersections(interval) do |intersections|
       self.intervals << merge_intervals(intersections.push(interval.range))
-    else
-      self.intervals << interval.range
     end
 
+    self.intervals << interval.range unless intersections.any?
     self.intervals.sort_by!(&:min)
   end
 
@@ -69,8 +61,20 @@ class Period
       [interval_min...gap.min + 1, gap.max...interval_max + 1]
     elsif gap.min > interval_min && gap.max > interval_max
       [interval_min...gap.min + 1]
+    elsif gap.min < interval_min && gap.max < interval_max
+      [gap.max...interval_max + 1]
     else
       []
     end
+  end
+
+  def find_intersections(interval)
+    interval_tree = IntervalTree::Tree.new(self.intervals)
+    intersections = interval_tree.search(interval.range).to_a
+    if intersections.any?
+      self.intervals -= intersections
+      yield(intersections) if block_given?
+    end
+    intersections
   end
 end

@@ -102,6 +102,8 @@ describe Period do
       it 'removes interval which is out of bounds' do
         subject.remove(2, 7).must_equal [[1, 2]]
         subject.remove(0, 4).must_equal []
+        subject.add(1,5).must_equal [[1,5]]
+        subject.remove(0,4).must_equal [[4,5]]
       end
 
       it 'removes few intervals at once' do
