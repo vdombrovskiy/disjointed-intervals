@@ -11,6 +11,7 @@ File.write('Gemfile', <<-GEMFILE)
   gem 'minitest-reporters'
   gem 'minitest-hooks'
   gem 'minitest-spec-context'
+  gem 'augmented_interval_tree'
 GEMFILE
 
 system 'bundle install'
